@@ -393,6 +393,22 @@ static void snapshot_post_process(omv_csi_t *csi, image_t *image) {
     }
 }
 
+// Edited function that delivers the raw event data
+
+static int snapshot_raw_events(omv_csi_t *csi, image_t *image, uint32_t flags) {
+    // 1) Grab the raw events just like normal:
+    int ret = omv_csi_snapshot(csi, image, flags);
+    if (ret < 0) {
+        return ret;
+    }
+    // 2) BUT DO NOT call snapshot_post_process. Leave image->data[] as raw 32-bit event words!
+    // 3) Also ensure image->pixfmt is set to a “binary blob” type so Python can read it.
+    image->pixfmt = PIXFORMAT_BINARY; // pick a format that MicroPython treats as raw bytes
+    return ret;
+}
+
+
+
 static int snapshot(omv_csi_t *csi, image_t *image, uint32_t flags) {
     #if (OMV_GENX320_EHC_ENABLE != 1)
     if (csi->transpose) {
@@ -581,6 +597,22 @@ static int ioctl(omv_csi_t *csi, int request, va_list ap) {
             }
             break;
         }
+
+          // ─────── New “use raw events” case ───────
+        case OMV_CSI_IOCTL_GENX320_USE_RAW_EVENTS: {
+            // va_arg(ap, int) will be 0 or 1 from Python
+            int use_raw = va_arg(ap, int);
+            if (use_raw) {
+                // Point the “snapshot” pointer at our raw‐event function
+                csi->snapshot = snapshot_raw_events;
+            } else {
+                // Restore the normal grayscale‐postprocess snapshot
+                csi->snapshot = snapshot;
+            }
+            break;
+        }
+        // ─────────────────────────────────────────
+        
         default: {
             ret = -1;
             break;
