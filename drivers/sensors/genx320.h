@@ -27,4 +27,5 @@
 #define __GENX320_H__
 #define OMV_GENX320_CLK_FREQ     (24000000)
 int genx320_init(omv_csi_t *csi);
+#define OMV_CSI_IOCTL_GENX320_USE_RAW_EVENTS (OMV_CSI_IOCTL_SENSOR_LAST + 1)
 #endif // __GENX320_H__
