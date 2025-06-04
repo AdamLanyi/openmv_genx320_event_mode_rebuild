@@ -405,6 +405,7 @@ static int snapshot_raw_events(omv_csi_t *csi, image_t *image, uint32_t flags) {
     // 3) Mark the frame buffer as “RAW” so Python will not try to interpret it as grayscale/binary
     image->pixfmt = PIXFORMAT_RAW;
     return ret;
+}
 
 
 
