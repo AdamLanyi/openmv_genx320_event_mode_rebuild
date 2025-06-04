@@ -403,7 +403,7 @@ static int snapshot_raw_events(omv_csi_t *csi, image_t *image, uint32_t flags) {
     }
     // 2) Do NOT call snapshot_post_process: leave image->data[] as raw 32-bit EVT20 words
     // 3) Mark the frame buffer as “RAW” so Python will not try to interpret it as grayscale/binary
-    image->pixfmt = PIXFORMAT_RAW;
+    image->pixfmt = FORMAT_RAW;
     return ret;
 }
 
